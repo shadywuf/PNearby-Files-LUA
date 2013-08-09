@@ -28,7 +28,7 @@ end
 local function sl(str)
  string.lower(str)
 end
-
+-- --
 local function readConfig()
  if fs.exists("PNearbyCFG") then
   tc = fs.open("PNearbyCFG/titleCol","r")
