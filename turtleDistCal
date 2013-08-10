@@ -1,0 +1,39 @@
+if not fs.exists("adv-refuel") then
+ print("Downloading adv-refuel...")
+ http.request("http://pastebin.com/raw.php?i=bZPUL52U")
+ event, url, SourceTXT = os.pullEvent()
+ if event == "http_success" then
+  AcText = SourceTXT.readAll()
+  print("Success!")
+  print("Use adv-refuel to use advanced refuel!")
+  h = fs.open("adv-refuel","w")
+  h.write(AcText)
+  h.close()
+ elseif event == "http_failure" then
+  print("Failed to download adv-refuel.")
+ end
+end
+ 
+write("Distance: ")
+dist = read()
+coal = 80
+stick = 5
+plank = 15
+wood = 15
+booksh = 15
+chest = 15
+print("You will need "..dist.." fuel level.")
+print("You can get that fuel level from: ")
+fuel = 0
+fuel = dist / coal
+print(fuel.." coal;")
+fuel = dist / stick
+print(fuel.." stick;")
+fuel = dist / plank
+print(fuel.." plank;")
+fuel = dist / wood
+print(fuel.." wood;")
+fuel = dist / booksh
+print(fuel.." bookshelf;")
+fuel = dist / chest
+print(fuel.." chest;")
