@@ -1,0 +1,354 @@
+--[[
+ 
+   ======================  
+   PNearby    
+   version 1.0
+   by Kristaps220
+   ======================
+   
+   To use this program, you will need
+   OpenCCSensors peripheral installed
+   
+   [OPTIONAL]
+   Proximity Sensor Card Mk4
+   2x3 Sized (advanced) monitor.
+   
+]]--
+ 
+ 
+local this = shell.getRunningProgram()
+local Arguments = { ... }  
+local version = "1.0"
+ 
+local function clear()
+ term.clear()
+ term.setCursorPos(1,1)
+end
+ 
+local function sl(str)
+ string.lower(str)
+end
+ 
+function update()
+ http.request("https://raw.github.com/Kristaps220/PNearby-Files-LUA/master/PNearby%20V1.1")
+ anotherStuff = true
+ while anotherStuff do
+  local evt, urs, ursText = os.pullEvent()
+  if evt == "http_success" then
+   local resText = ursText.readAll()
+   if fs.exists("PNearby") then
+    fs.delete("PNearby")
+   end
+   han = fs.open("PNearby","w")
+   han.write(resText)
+   han.close()
+   print("Finished updating. New file name: PNearby")
+   print(" ")
+   anotherStuff = false
+  elseif evt == "http_failure" then
+   print("Failed to connect to github. Download newest version automatically at ComputerCraft forums PNearby topic")
+   anotherStuff = false
+  end
+ end
+end
+ 
+function checkForUpdates()
+ http.request("https://raw.github.com/Kristaps220/PNearby-Files-LUA/master/updateAvailable")
+ local stuff = true
+ while stuff do
+  local event, url, urlText = os.pullEvent()
+  if event == "http_success" then
+   local respText = urlText.readAll()
+   if respText == "yes" then
+    print("Update available! Would you like to download it now?")
+    write("Yes/No : ")
+    tAnswer = read()
+    if tAnswer == string.lower("yes") then
+     print("Updating now...")
+     stuff = false
+     update()
+    else
+     print("Updating cancelled.")
+     stuff = false
+     print(" ")
+    end
+   end
+   stuff = false
+  elseif event == "http_failure" then
+   print("Failed to connect to github. Download newest version automatically at ComputerCraft forums PNearby topic. ")
+   stuff = false
+   print(" ")
+  end
+ end
+end
+ 
+local function readConfig()
+ if fs.exists("PNearbyCFG") then
+  tc = fs.open("PNearbyCFG/titleCol","r")
+  nc = fs.open("PNearbyCFG/namesCol","r")
+  it = fs.open("PNearbyCFG/updinter","r")
+  sc = fs.open("PNearbyCFG/monscale","r")
+  titleCol = tc.readAll()
+  namesCol = nc.readAll()
+  inter = it.readAll()
+  scale = sc.readAll()
+  tc.close()
+  nc.close()
+  it.close()
+  sc.close()
+ else
+  print("Please set up configuration file to use this program.")
+  term.restore()
+  error()
+ end
+end
+--readconfig and check if conifguration directory exists
+ 
+local function fColor()
+ if term.isColor() then
+  term.setTextColor(8)
+  print("Welcome to "..this.." config setup!\n")
+  term.setTextColor(128)
+  write("Do not use numeric colors (")
+  term.setTextColor(2048)
+  write("1 2 4 8 etc.")
+  term.setTextColor(128)
+  write(") because this program isn't compatible with them. Use instead colors.(color) example: colors.")
+  term.setTextColor(2)
+  print("orange ")
+  term.setTextColor(128)
+  write("Title Color: ")
+  term.setTextColor(256)
+  tic = read()
+  term.setTextColor(128)
+  write("Names Color: ")
+  term.setTextColor(256)
+  nic = read()
+  term.setTextColor(128)
+  write("Names list updating interval: ")
+  term.setTextColor(256)
+  int = read()
+  term.setTextColor(128)
+  write("Monitor text scale: ")
+  term.setTextColor(256)
+  sca = read()
+  term.setTextColor(1)
+  print(" ")
+  print("Use "..this.." run to run the program!")
+ else
+  print("Welcome to "..this.." config setup!\n")
+  print("Write numeric colors (1,2,4,8) or colors.(color) example: colors.orange")
+  write("Title Color: ")
+  tic = read()
+  write("Names Color: ")
+  nic = read()
+  write("Names list updating interval: ")
+  int = read()
+  write("Monitor text scale: ")
+  sca = read()
+ end
+end
+ 
+local function setConfig()
+ if fs.isDir("PNearbyCFG") then
+  clear()
+  tc = fs.open("PNearbyCFG/titleCol","w")
+  nc = fs.open("PNearbyCFG/namesCol","w")
+  it = fs.open("PNearbyCFG/updinter","w")
+  sc = fs.open("PNearbyCFG/monscale","w")
+  fColor()
+ -- WARNING: Walls of 'if ... then' !!
+ if tic == "colors.white" then
+  tic2 = "1"
+ elseif tic == "colors.orange" then
+  tic2 = "2"
+ elseif tic == "colors.magenta" then
+  tic2 = "4"
+ elseif tic == "colors.lightBlue" then
+  tic2 = "8"
+ elseif tic == "colors.yellow" then
+  tic2 = "16"
+ elseif tic == "colors.lime" then
+  tic2 = "32"
+ elseif tic == "colors.pink" then
+  tic2 = "64"
+ elseif tic == "colors.gray" then
+  tic2 = "128"
+ elseif tic == "colors.lightGray" then
+  tic2 = "256"
+ elseif tic == "colors.cyan" then
+  tic2 = "512"
+ elseif tic == "colors.purple" then
+  tic2 = "1048"
+ elseif tic == "colors.blue" then
+  tic2 = "2048"
+ elseif tic == "colors.brown" then
+  tic2 = "4096"
+ elseif tic == "colors.green" then
+  tic2 = "32"
+ elseif tic == "colors.red" then
+  tic2 = "16384"
+ elseif tic == "colors.black" then
+  tic2 = "32768"
+ end
+ 
+ 
+  if nic == "colors.white" then
+  nic2 = "1"
+ elseif nic == "colors.orange" then
+  nic2 = "2"
+ elseif nic == "colors.magenta" then
+  nic2 = "4"
+ elseif nic == "colors.lightBlue" then
+  nic2 = "8"
+ elseif nic == "colors.yellow" then
+  nic2 = "16"
+ elseif nic == "colors.lime" then
+  nic2 = "32"
+ elseif nic == "colors.pink" then
+  nic2 = "64"
+ elseif nic == "colors.gray" then
+  nic2 = "128"
+ elseif nic == "colors.lightGray" then
+  nic2 = "256"
+ elseif nic == "colors.cyan" then
+  nic2 = "512"
+ elseif nic == "colors.purple" then
+  nic2 = "1048"
+ elseif nic == "colors.blue" then
+  nic2 = "2048"
+ elseif nic == "colors.brown" then
+  nic2 = "4096"
+ elseif nic == "colors.green" then
+  nic2 = "32"
+ elseif nic == "colors.red" then
+  nic2 = "16384"
+ elseif nic == "colors.black" then
+  nic2 = "32768"
+ end
+ 
+  tc.writeLine(tic2)
+  nc.writeLine(nic2)
+  it.writeLine(int)
+  sc.writeLine(sca)
+ 
+  tc.close()
+  nc.close()
+  it.close()
+  sc.close()
+ else
+  print("Generating PNearbyCFG directory...")
+  fs.makeDir("PNearbyCFG")
+  print("Done.")
+  print("Use "..this.." config to set up the configuration.")
+ end
+end
+ 
+checkForUpdates()
+if Arguments[1] == "config" then
+ setConfig()
+elseif Arguments[1] == "run" then
+ 
+readConfig()
+print("Press Q to quit.")
+os.loadAPI("ocs/apis/sensor")
+ 
+local function wrapSensor()
+ if peripheral.getType("bottom") == "sensor" then
+  prox = sensor.wrap("bottom")
+ elseif peripheral.getType("top") == "sensor" then
+  prox = sensor.wrap("top")
+ elseif peripheral.getType("right") == "sensor" then
+  prox = sensor.wrap("right")
+ elseif peripheral.getType("left") == "sensor" then
+  prox = sensor.wrap("left")
+ elseif peripheral.getType("back") == "sensor" then
+  prox = sensor.wrap("back")
+ elseif peripheral.getType("front") == "sensor" then
+  prox = sensor.wrap("front")
+ end
+end
+ 
+local function wrapMonitor()
+ if peripheral.getType("bottom") == "monitor" then
+  m = peripheral.wrap("bottom")
+ elseif peripheral.getType("top") == "monitor" then
+  m = peripheral.wrap("top")
+ elseif peripheral.getType("left") == "monitor" then
+  m = peripheral.wrap("left")
+ elseif peripheral.getType("right") == "monitor" then
+  m = peripheral.wrap("right")
+ elseif peripheral.getType("front") == "monitor" then
+  m = peripheral.wrap("front")
+ elseif peripheral.getType("back") == "monitor" then
+  m = peripheral.wrap("back")
+ end
+end
+ 
+ 
+local function main()
+ 
+ wrapSensor()
+ wrapMonitor()
+ 
+ local targets = prox.getTargets()
+ 
+ m.clear()
+ m.setCursorPos(1,1)
+ m.setTextColor(tonumber(titleCol))
+ m.setTextScale(tonumber(scale))
+ 
+ term.redirect(m)
+ print(" PLAYERS NEARBY "..version.."\n")
+ for name, basicDetails in pairs(targets) do
+  local moreDetails = prox.getTargetDetails(name)
+  if moreDetails.Name == "Player" then
+   term.setTextColor(tonumber(namesCol))
+   print(name.." "..moreDetails.Health.."HP")
+  end
+ end
+ term.restore()
+end
+ 
+--* Thanks to TheoriginalBIT for BSoD tutorial! *--
+function callMain()
+ while true do
+  local ok, err = pcall(main)
+  os.startTimer(tonumber(inter))
+  evt, param1 = os.pullEvent()
+  if evt == "key" then
+   if param1 == 16 then
+    sleep(0.1)
+    m.clear()
+    m.setCursorPos(1,1)
+    print("Stopped.")
+    term.restore()
+    break
+   end
+  end
+ 
+  if not ok then
+   term.restore()
+   print("Something bad happened. Check if you have attached monitor and Sensor Peripheral and make sure, that Sensor Peripheral has Proximity Sensor Card in it.")
+   print("The actual error code is:")
+   print(err)
+   break
+  end
+ end
+end
+ 
+callMain()
+ 
+else
+ print("Usage: ")
+ print(this.." run")
+ print(this.." config")
+end
+ 
+--[[
+   
+    If program crashes and you can't
+    edit any file, then reboot the
+    computer.
+ 
+]]--
